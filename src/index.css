@@ -1,13 +1,21 @@
+/*Estos imports eran necesarios para que TailwindCSS3 funcionara correctamente*/
+/*Ahora estoy utilizando TailwindCSS4, por lo que estos imports ya no son necesarios*/
+/*@tailwind base;*/
+/*@tailwindcss /preflight;*/
+/*@tailwind components;*/
+/*@tailwind utilities;*/
+@import "tailwindcss";
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
