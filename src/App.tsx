@@ -6,7 +6,7 @@ import Dashboard from './components/Dashboard';
 import UserManagement from './components/UserManagement';
 import ProductManagement from './components/ProductManagement';
 import Layout from './components/Layout';
-
+import { HashRouter } from 'react-router-dom';
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
   const { user, isAuthenticated } = useAuth();
   
@@ -68,7 +68,8 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+
+      <Router basename="/proyectoreact/">
         <div className="min-h-screen bg-gray-50">
           <AppRoutes />
         </div>

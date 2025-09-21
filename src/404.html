@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Page Not Found</title>
+    <script type="text/javascript">
+      // Redirige al usuario al index.html manteniendo la ruta.
+      var path = window.location.pathname;
+      var redirect = path.split('/proyectoreact')[1];
+      window.location.replace("https://romanmunoz.github.io/proyectoreact/index.html#" + redirect);
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

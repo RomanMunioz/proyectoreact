@@ -1,4 +1,4 @@
-import api from '../config/api';
+import api from "../config/api";
 
 export interface Product {
   id: number;
@@ -34,7 +34,7 @@ export interface StockMovement {
   id: number;
   productId: number;
   productName: string;
-  type: 'ENTRADA' | 'SALIDA';
+  type: "ENTRADA" | "SALIDA";
   quantity: number;
   date: string;
   userId: number;
@@ -44,14 +44,14 @@ export interface StockMovement {
 
 export interface StockMovementRequest {
   productId: number;
-  type: 'ENTRADA' | 'SALIDA';
+  type: "ENTRADA" | "SALIDA";
   quantity: number;
   reason?: string;
 }
 
 export const productService = {
   async getAllProducts(): Promise<Product[]> {
-    const response = await api.get('/products');
+    const response = await api.get("/products");
     return response.data;
   },
 
@@ -61,11 +61,14 @@ export const productService = {
   },
 
   async createProduct(productData: CreateProductRequest): Promise<Product> {
-    const response = await api.post('/products', productData);
+    const response = await api.post("/products", productData);
     return response.data;
   },
 
-  async updateProduct(id: number, productData: UpdateProductRequest): Promise<Product> {
+  async updateProduct(
+    id: number,
+    productData: UpdateProductRequest
+  ): Promise<Product> {
     const response = await api.put(`/products/${id}`, productData);
     return response.data;
   },
@@ -75,38 +78,48 @@ export const productService = {
   },
 
   async searchProducts(query: string): Promise<Product[]> {
-    const response = await api.get(`/products/search?q=${encodeURIComponent(query)}`);
+    const response = await api.get(
+      `/products/search?q=${encodeURIComponent(query)}`
+    );
     return response.data;
   },
 
   async getProductsByCategory(category: string): Promise<Product[]> {
-    const response = await api.get(`/products/category/${encodeURIComponent(category)}`);
+    const response = await api.get(
+      `/products/category/${encodeURIComponent(category)}`
+    );
     return response.data;
   },
 
   async getLowStockProducts(): Promise<Product[]> {
-    const response = await api.get('/products/low-stock');
+    const response = await api.get("/products/low-stock");
     return response.data;
   },
 
   async getCategories(): Promise<string[]> {
-    const response = await api.get('/products/categories');
+    const response = await api.get("/products/categories");
     return response.data;
   },
 
   // Stock movements
-  async createStockMovement(movementData: StockMovementRequest): Promise<StockMovement> {
-    const response = await api.post('/stock-movements', movementData);
+  async createStockMovement(
+    movementData: StockMovementRequest
+  ): Promise<StockMovement> {
+    const response = await api.post("/stock-movements", movementData);
     return response.data;
   },
 
   async getStockMovements(limit?: number): Promise<StockMovement[]> {
-    const response = await api.get(`/stock-movements${limit ? `?limit=${limit}` : ''}`);
+    const response = await api.get(
+      `/stock-movements${limit ? `?limit=${limit}` : ""}`
+    );
     return response.data;
   },
 
-  async getStockMovementsByProduct(productId: number): Promise<StockMovement[]> {
+  async getStockMovementsByProduct(
+    productId: number
+  ): Promise<StockMovement[]> {
     const response = await api.get(`/stock-movements/product/${productId}`);
     return response.data;
-  }
+  },
 };

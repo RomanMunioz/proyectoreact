@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
 import { productService, type Product, type CreateProductRequest, type UpdateProductRequest } from '../services/productService';
+import { mockProducts } from '../mockData'; 
 
 export default function ProductManagement() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -23,20 +24,25 @@ export default function ProductManagement() {
   useEffect(() => {
     loadProducts();
     loadCategories();
+  
   }, []);
 
   const loadProducts = async () => {
-    try {
-      setLoading(true);
-      const productsData = await productService.getAllProducts();
-      setProducts(productsData);
-    } catch (err) {
-      setError('Error al cargar productos');
-      console.error('Error loading products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    // Intenta cargar los datos de la API real primero
+    const productsData = await productService.getAllProducts();
+    setProducts(productsData);
+  } catch (err) {
+    // Si hay un error (por ejemplo, 404 Not Found),
+    // usa los datos de prueba del mock data
+    //console.error('Error loading products from API, using mock data:', err);
+    setProducts(mockProducts);
+    //setError('No se pudo conectar a la API. Se están mostrando datos de prueba.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loadCategories = async () => {
     try {
@@ -46,83 +52,92 @@ export default function ProductManagement() {
       console.error('Error loading categories:', err);
     }
   };
+const filteredProducts = products && products.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              product.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = !categoryFilter || product.category === categoryFilter;
+        return matchesSearch && matchesCategory;
+    });
 
-  const filteredProducts = products && products.filter(product => {
-  const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        product.description.toLowerCase().includes(searchTerm.toLowerCase());
-  const matchesCategory = !categoryFilter || product.category === categoryFilter;
-  return matchesSearch && matchesCategory;
-});
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    try {
+      // Asegúrate de convertir las cadenas a números antes de enviar
+      const productData = {
+        name: formData.name,
+        description: formData.description,
+        // Convierte a número entero
+        quantity: parseInt(formData.quantity), 
+        // Convierte a número decimal
+        price: parseFloat(formData.price),     
+        category: formData.category,
+        // Convierte a número entero
+        minStock: parseInt(formData.minStock)   
+      };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    try {
-      const productData = {
-        name: formData.name,
-        description: formData.description,
-        quantity: parseInt(formData.quantity),
-        price: parseFloat(formData.price),
-        category: formData.category,
-        minStock: parseInt(formData.minStock)
-      };
+      if (editingProduct) {
+        await productService.updateProduct(editingProduct.id, productData);
+      } else {
+        await productService.createProduct(productData);
+      }
+      
+      // Recarga los datos y limpia el formulario
+      await loadProducts();
+      await loadCategories();
+      resetForm();
+    } catch (err) {
+      setError(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto');
+      console.error('Error saving product:', err);
+    }
+  };
 
-      if (editingProduct) {
-        await productService.updateProduct(editingProduct.id, productData);
-      } else {
-        await productService.createProduct(productData);
-      }
-      
-      await loadProducts();
-      await loadCategories();
-      resetForm();
-    } catch (err) {
-      setError(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto');
-      console.error('Error saving product:', err);
-    }
-  };
+    const handleDelete = async (id: number) => {
+        if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+            try {
+                // Usa el productService determinado
+                await productService.deleteProduct(id); 
+                await loadProducts();
+                // await loadCategories(); // Si fuera necesario
+            } catch (err) {
+                setError('Error al eliminar producto');
+                console.error('Error deleting product:', err);
+            }
+        }
+    };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      try {
-        await productService.deleteProduct(id);
-        await loadProducts();
-        await loadCategories();
-      } catch (err) {
-        setError('Error al eliminar producto');
-        console.error('Error deleting product:', err);
-      }
-    }
-  };
+    const handleSearch = async (query: string) => {
+        setSearchTerm(query);
+        if (query.trim()) {
+            try {
+                // Usa el productService determinado
+                const searchResults = await productService.searchProducts(query); 
+                setProducts(searchResults);
+            } catch (err) {
+                console.error('Error searching products:', err);
+                // Podrías querer mostrar un error aquí también
+            }
+        } else {
+            await loadProducts(); // Vuelve a cargar todos los productos si el campo de búsqueda está vacío
+        }
+    };
 
-  const handleSearch = async (query: string) => {
-    setSearchTerm(query);
-    if (query.trim()) {
-      try {
-        const searchResults = await productService.searchProducts(query);
-        setProducts(searchResults);
-      } catch (err) {
-        console.error('Error searching products:', err);
-      }
-    } else {
-      await loadProducts();
-    }
-  };
-
-  const handleCategoryFilter = async (category: string) => {
-    setCategoryFilter(category);
-    if (category) {
-      try {
-        const categoryProducts = await productService.getProductsByCategory(category);
-        setProducts(categoryProducts);
-      } catch (err) {
-        console.error('Error filtering by category:', err);
-      }
-    } else {
-      await loadProducts();
-    }
-  };
+    const handleCategoryFilter = async (category: string) => {
+        setCategoryFilter(category);
+        if (category) {
+            try {
+                // Asegúrate de que tu mockProductService y tu API real tengan este método
+                const categoryProducts = await productService.getProductsByCategory(category); 
+                setProducts(categoryProducts);
+            } catch (err) {
+                console.error('Error filtering by category:', err);
+                // Manejar el error
+            }
+        } else {
+            await loadProducts(); // Muestra todos los productos si se selecciona "Todas las categorías"
+        }
+    };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
