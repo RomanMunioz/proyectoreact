@@ -1,175 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
 import { productService, type Product, type CreateProductRequest, type UpdateProductRequest } from '../services/productService';
-import { mockProducts } from '../mockData'; 
 
-export default function ProductManagement() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [categories, setCategories] = useState<string[]>([]);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    quantity: '',
-    price: '',
-    category: '',
-    minStock: ''
-  });
 
-  useEffect(() => {
-    loadProducts();
-    loadCategories();
-  
-  }, []);
 
-  const loadProducts = async () => {
+useEffect(() => {
+  loadProducts();
+  loadCategories();
+}, []);
+
+const loadProducts = async () => {
   try {
     setLoading(true);
-    // Intenta cargar los datos de la API real primero
-    const productsData = await productService.getAllProducts();
-    setProducts(productsData);
+    const res = await fetch("https://nodebackend-mysql-api.onrender.com/products");
+
+    const data = await res.json();
+    setProducts(data);
   } catch (err) {
-    // Si hay un error (por ejemplo, 404 Not Found),
-    // usa los datos de prueba del mock data
-    //console.error('Error loading products from API, using mock data:', err);
-    setProducts(mockProducts);
-    //setError('No se pudo conectar a la API. Se están mostrando datos de prueba.');
+    console.error("Error loading products:", err);
+    setError("No se pudieron cargar los productos.");
   } finally {
     setLoading(false);
   }
 };
 
-  const loadCategories = async () => {
-    try {
-      const categoriesData = await productService.getCategories();
-      setCategories(categoriesData);
-    } catch (err) {
-      console.error('Error loading categories:', err);
-    }
-  };
-const filteredProducts = products && products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              product.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = !categoryFilter || product.category === categoryFilter;
-        return matchesSearch && matchesCategory;
-    });
+const loadCategories = async () => {
+  try {
+    const res = await fetch("https://nodebackend-mysql-api.onrender.com/products/categories");
 
-    const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    try {
-      // Asegúrate de convertir las cadenas a números antes de enviar
-      const productData = {
-        name: formData.name,
-        description: formData.description,
-        // Convierte a número entero
-        quantity: parseInt(formData.quantity), 
-        // Convierte a número decimal
-        price: parseFloat(formData.price),     
-        category: formData.category,
-        // Convierte a número entero
-        minStock: parseInt(formData.minStock)   
-      };
+    const data = await res.json();
+    setCategories(data);
+  } catch (err) {
+    console.error("Error loading categories:", err);
+  }
+};
 
-      if (editingProduct) {
-        await productService.updateProduct(editingProduct.id, productData);
-      } else {
-        await productService.createProduct(productData);
-      }
-      
-      // Recarga los datos y limpia el formulario
-      await loadProducts();
-      await loadCategories();
-      resetForm();
-    } catch (err) {
-      setError(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto');
-      console.error('Error saving product:', err);
-    }
-  };
+const filteredProducts = products.filter(product => {
+  const matchesSearch =
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const handleDelete = async (id: number) => {
-        if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-            try {
-                // Usa el productService determinado
-                await productService.deleteProduct(id); 
-                await loadProducts();
-                // await loadCategories(); // Si fuera necesario
-            } catch (err) {
-                setError('Error al eliminar producto');
-                console.error('Error deleting product:', err);
-            }
-        }
-    };
+  const matchesCategory =
+    !categoryFilter || product.category === categoryFilter;
 
-    const handleSearch = async (query: string) => {
-        setSearchTerm(query);
-        if (query.trim()) {
-            try {
-                // Usa el productService determinado
-                const searchResults = await productService.searchProducts(query); 
-                setProducts(searchResults);
-            } catch (err) {
-                console.error('Error searching products:', err);
-                // Podrías querer mostrar un error aquí también
-            }
-        } else {
-            await loadProducts(); // Vuelve a cargar todos los productos si el campo de búsqueda está vacío
-        }
-    };
+  return matchesSearch && matchesCategory;
+});
 
-    const handleCategoryFilter = async (category: string) => {
-        setCategoryFilter(category);
-        if (category) {
-            try {
-                // Asegúrate de que tu mockProductService y tu API real tengan este método
-                const categoryProducts = await productService.getProductsByCategory(category); 
-                setProducts(categoryProducts);
-            } catch (err) {
-                console.error('Error filtering by category:', err);
-                // Manejar el error
-            }
-        } else {
-            await loadProducts(); // Muestra todos los productos si se selecciona "Todas las categorías"
-        }
-    };
-
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      description: product.description,
-      quantity: product.quantity.toString(),
-      price: product.price.toString(),
-      category: product.category,
-      minStock: product.minStock.toString()
-    });
-    setShowModal(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      quantity: '',
-      price: '',
-      category: '',
-      minStock: ''
-    });
-    setEditingProduct(null);
-    setShowModal(false);
-    setError('');
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
   if (loading) {
     return (
@@ -178,6 +54,81 @@ const filteredProducts = products && products.filter(product => {
       </div>
     );
   }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+
+  const productData = {
+    name: formData.name,
+    description: formData.description,
+    quantity: Number(formData.quantity),
+    price: Number(formData.price),
+    category: formData.category,
+    minStock: Number(formData.minStock),
+  };
+
+  try {
+    if (editingProduct) {
+      // UPDATE
+      await fetch(`https://nodebackend-mysql-api.onrender.com/products/${editingProduct.id}`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(productData),
+});
+
+    } else {
+      // CREATE
+      await fetch("https://nodebackend-mysql-api.onrender.com/products", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(productData),
+});
+
+    }
+
+    await loadProducts();
+    resetForm();
+
+  } catch (err) {
+    console.error("Error saving product:", err);
+    setError("Error al guardar el producto.");
+  }
+};
+
+const handleDelete = async (id: number) => {
+  if (!confirm("¿Eliminar este producto?")) return;
+
+  try {
+    await fetch(`https://nodebackend-mysql-api.onrender.com/products/${id}`, {
+  method: "DELETE",
+});
+
+
+    await loadProducts();
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    setError("Error al eliminar producto.");
+  }
+};
+const handleSearch = async (query: string) => {
+  setSearchTerm(query);
+
+  if (!query.trim()) {
+    loadProducts();
+    return;
+  }
+
+  try {
+    await fetch(`https://nodebackend-mysql-api.onrender.com/products/search?q=${query}`);
+
+    const data = await res.json();
+    setProducts(data);
+  } catch (err) {
+    console.error("Error searching:", err);
+  }
+};
+
 
   return (
     <div className="space-y-6">
