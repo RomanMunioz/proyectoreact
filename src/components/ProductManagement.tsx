@@ -368,4 +368,4 @@ const handleSearch = async (query: string) => {
       )}
     </div>
   );
-}
+};
