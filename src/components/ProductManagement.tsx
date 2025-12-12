@@ -67,36 +67,39 @@ const loadCategories = async () => {
     minStock: Number(formData.minStock),
   };
 
- // CREATE
-await fetch("https://nodebackend-mysql-api.onrender.com/products", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(productData),
-});
-
-// UPDATE
-await fetch(`https://nodebackend-mysql-api.onrender.com/products/${editingProduct.id}`, {
-  method: "PUT",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(productData),
-});
-
+  try {
+    if (editingProduct) {
+      // UPDATE
+      await fetch(`https://nodebackend-mysql-api.onrender.com/products/${editingProduct.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+      });
+    } else {
+      // CREATE
+      await fetch("https://nodebackend-mysql-api.onrender.com/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+      });
     }
 
     await loadProducts();
     resetForm();
-
   } catch (err) {
     console.error("Error saving product:", err);
     setError("Error al guardar el producto.");
   }
 };
 
-const handleDelete = async (id: number) => {
-  await fetch(`https://nodebackend-mysql-api.onrender.com/products/${id}`, {
-  method: "DELETE",
-});
 
+const handleDelete = async (id: number) => {
+  if (!confirm("¿Eliminar este producto?")) return;
+
+  try {
+    await fetch(`https://nodebackend-mysql-api.onrender.com/products/${id}`, {
+      method: "DELETE",
+    });
 
     await loadProducts();
   } catch (err) {
@@ -107,10 +110,21 @@ const handleDelete = async (id: number) => {
 const handleSearch = async (query: string) => {
   setSearchTerm(query);
 
-const res = await fetch(
-  `https://nodebackend-mysql-api.onrender.com/products/search?q=${query}`
-);
+  if (!query.trim()) {
+    loadProducts();
+    return;
+  }
 
+  try {
+    const res = await fetch(
+      `https://nodebackend-mysql-api.onrender.com/products/search?q=${query}`
+    );
+    const data = await res.json();
+    setProducts(data);
+  } catch (err) {
+    console.error("Error searching:", err);
+  }
+};
 
 
   return (
