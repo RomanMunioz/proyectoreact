@@ -2,39 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
 import { productService, type Product, type CreateProductRequest, type UpdateProductRequest } from '../services/productService';
 
-
-
-useEffect(() => {
-  loadProducts();
-  loadCategories();
-}, []);
-
-const loadProducts = async () => {
-  try {
-    setLoading(true);
-    const res = await fetch("https://nodebackend-mysql-api.onrender.com/products");
-
-    const data = await res.json();
-    setProducts(data);
-  } catch (err) {
-    console.error("Error loading products:", err);
-    setError("No se pudieron cargar los productos.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-const loadCategories = async () => {
-  try {
-    const res = await fetch("https://nodebackend-mysql-api.onrender.com/products/categories");
-
-    const data = await res.json();
-    setCategories(data);
-  } catch (err) {
-    console.error("Error loading categories:", err);
-  }
-};
-
 const filteredProducts = products.filter(product => {
   const matchesSearch =
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,6 +22,38 @@ const filteredProducts = products.filter(product => {
     );
   }
 
+
+useEffect(() => {
+  loadProducts();
+  loadCategories();
+}, []);
+
+const loadProducts = async () => {
+  try {
+    setLoading(true);
+    const res = await fetch("https://nodebackend-mysql-api.onrender.com/products");
+    const data = await res.json();
+    setProducts(data);
+  } catch (err) {
+    console.error("Error loading products:", err);
+    setError("No se pudieron cargar los productos.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const loadCategories = async () => {
+  try {
+    const res = await fetch("https://nodebackend-mysql-api.onrender.com/products/categories");
+    const data = await res.json();
+    setCategories(data);
+  } catch (err) {
+    console.error("Error loading categories:", err);
+  }
+};
+
+
+
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError("");
@@ -68,19 +67,16 @@ const filteredProducts = products.filter(product => {
     minStock: Number(formData.minStock),
   };
 
-  try {
-    if (editingProduct) {
-      // UPDATE
-      await fetch(`https://nodebackend-mysql-api.onrender.com/products/${editingProduct.id}`, {
-  method: "PUT",
+ // CREATE
+await fetch("https://nodebackend-mysql-api.onrender.com/products", {
+  method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(productData),
 });
 
-    } else {
-      // CREATE
-      await fetch("https://nodebackend-mysql-api.onrender.com/products", {
-  method: "POST",
+// UPDATE
+await fetch(`https://nodebackend-mysql-api.onrender.com/products/${editingProduct.id}`, {
+  method: "PUT",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(productData),
 });
@@ -97,10 +93,7 @@ const filteredProducts = products.filter(product => {
 };
 
 const handleDelete = async (id: number) => {
-  if (!confirm("¿Eliminar este producto?")) return;
-
-  try {
-    await fetch(`https://nodebackend-mysql-api.onrender.com/products/${id}`, {
+  await fetch(`https://nodebackend-mysql-api.onrender.com/products/${id}`, {
   method: "DELETE",
 });
 
@@ -114,20 +107,10 @@ const handleDelete = async (id: number) => {
 const handleSearch = async (query: string) => {
   setSearchTerm(query);
 
-  if (!query.trim()) {
-    loadProducts();
-    return;
-  }
+const res = await fetch(
+  `https://nodebackend-mysql-api.onrender.com/products/search?q=${query}`
+);
 
-  try {
-    await fetch(`https://nodebackend-mysql-api.onrender.com/products/search?q=${query}`);
-
-    const data = await res.json();
-    setProducts(data);
-  } catch (err) {
-    console.error("Error searching:", err);
-  }
-};
 
 
   return (
