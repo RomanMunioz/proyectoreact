@@ -6,7 +6,7 @@ export interface Product {
   description: string;
   quantity: number;
   price: number;
-  category: string;
+  categories: string;
   minStock: number;
   createdAt: string;
   updatedAt: string;
@@ -17,7 +17,7 @@ export interface CreateProductRequest {
   description: string;
   quantity: number;
   price: number;
-  category: string;
+  categories: string;
   minStock: number;
 }
 
@@ -26,7 +26,7 @@ export interface UpdateProductRequest {
   description?: string;
   quantity?: number;
   price?: number;
-  category?: string;
+  categories?: string;
   minStock?: number;
 }
 
@@ -67,7 +67,7 @@ export const productService = {
 
   async updateProduct(
     id: number,
-    productData: UpdateProductRequest
+    productData: UpdateProductRequest,
   ): Promise<Product> {
     const response = await api.put(`/products/${id}`, productData);
     return response.data;
@@ -79,14 +79,14 @@ export const productService = {
 
   async searchProducts(query: string): Promise<Product[]> {
     const response = await api.get(
-      `/products/search?q=${encodeURIComponent(query)}`
+      `/products/search?q=${encodeURIComponent(query)}`,
     );
     return response.data;
   },
 
-  async getProductsByCategory(category: string): Promise<Product[]> {
+  async getProductsByCategories(categories: string): Promise<Product[]> {
     const response = await api.get(
-      `/products/category/${encodeURIComponent(category)}`
+      `/products/categories/${encodeURIComponent(categories)}`,
     );
     return response.data;
   },
@@ -103,7 +103,7 @@ export const productService = {
 
   // Stock movements
   async createStockMovement(
-    movementData: StockMovementRequest
+    movementData: StockMovementRequest,
   ): Promise<StockMovement> {
     const response = await api.post("/stock-movements", movementData);
     return response.data;
@@ -111,13 +111,13 @@ export const productService = {
 
   async getStockMovements(limit?: number): Promise<StockMovement[]> {
     const response = await api.get(
-      `/stock-movements${limit ? `?limit=${limit}` : ""}`
+      `/stock-movements${limit ? `?limit=${limit}` : ""}`,
     );
     return response.data;
   },
 
   async getStockMovementsByProduct(
-    productId: number
+    productId: number,
   ): Promise<StockMovement[]> {
     const response = await api.get(`/stock-movements/product/${productId}`);
     return response.data;

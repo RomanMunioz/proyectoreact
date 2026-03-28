@@ -8,9 +8,9 @@ const filteredProducts = products.filter(product => {
     product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
   const matchesCategory =
-    !categoryFilter || product.category === categoryFilter;
+    !categoriesFilter || product.categories.includes(categoriesFilter);
 
-  return matchesSearch && matchesCategory;
+  return matchesSearch && matchesCategories;
 });
 
 
