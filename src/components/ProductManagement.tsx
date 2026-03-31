@@ -8,9 +8,9 @@ const filteredProducts = products.filter(product => {
     product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
   const matchesCategory =
-    !categoriesFilter || product.categories.includes(categoriesFilter);
+    !categoriesFilter || product.categories === categoriesFilter;
 
-  return matchesSearch && matchesCategories;
+  return matchesSearch && matchesCategory;
 });
 
 
@@ -52,7 +52,12 @@ const loadCategories = async () => {
   }
 };
 
-
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -63,7 +68,7 @@ const loadCategories = async () => {
     description: formData.description,
     quantity: Number(formData.quantity),
     price: Number(formData.price),
-    category: formData.category,
+    categories: formData.categories,
     minStock: Number(formData.minStock),
   };
 
@@ -107,6 +112,15 @@ const handleDelete = async (id: number) => {
     setError("Error al eliminar producto.");
   }
 };
+const [formData, setFormData] = useState({
+  name: "",
+  description: "",
+  quantity: 0,
+  price: 0,
+  categories: "",
+  minStock: 0,
+});
+
 const handleSearch = async (query: string) => {
   setSearchTerm(query);
 
@@ -327,7 +341,7 @@ const handleSearch = async (query: string) => {
                 <input
                   type="text"
                   name="category"
-                  value={formData.category}
+                  value={formData.categories}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
