@@ -1,9 +1,16 @@
 import axios from "axios";
 
-// ✅ Configuración del API con debugging
+/** Public API URL; must be absolute on GitHub Pages or requests hit the static host (404 on /products). */
+const DEFAULT_API_BASE = "https://nodebackend-mysql-api.onrender.com";
+
+function resolveApiBaseUrl(): string {
+  const fromEnv = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "") ?? "";
+  return fromEnv || DEFAULT_API_BASE;
+}
+
 const api = axios.create({
-  baseURL: "https://nodebackend-mysql-api.onrender.com",
-  timeout: 10000, // 10 segundos de timeout
+  baseURL: resolveApiBaseUrl(),
+  timeout: 10000,
 });
 
 // ✅ Interceptor para debugging
