@@ -1,5 +1,7 @@
 import axios from "axios";
 
+/// <reference types="vite/client" />
+
 /** Public API URL; must be absolute on GitHub Pages or requests hit the static host (404 on /products). */
 const DEFAULT_API_BASE = "https://nodebackend-mysql-api.onrender.com";
 
