@@ -1,12 +1,17 @@
 import axios from "axios";
 
-/// <reference types="vite/client" />
-
 /** Public API URL; must be absolute on GitHub Pages or requests hit the static host (404 on /products). */
 const DEFAULT_API_BASE = "https://nodebackend-mysql-api.onrender.com";
 
+interface ViteImportMeta {
+  readonly env: {
+    readonly VITE_API_URL?: string;
+  };
+}
+
 function resolveApiBaseUrl(): string {
-  const fromEnv = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "") ?? "";
+  const meta = import.meta as unknown as ViteImportMeta;
+  const fromEnv = meta.env.VITE_API_URL?.trim().replace(/\/+$/, "") ?? "";
   return fromEnv || DEFAULT_API_BASE;
 }
 
@@ -24,7 +29,7 @@ api.interceptors.request.use(
   (error) => {
     console.error("Request error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 api.interceptors.response.use(
@@ -39,7 +44,7 @@ api.interceptors.response.use(
       message: error.message,
     });
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
@@ -150,7 +155,7 @@ export const userService = {
   async searchUsers(query: string): Promise<User[]> {
     try {
       const response = await api.get(
-        `/users/search?q=${encodeURIComponent(query)}`
+        `/users/search?q=${encodeURIComponent(query)}`,
       );
       return response.data;
     } catch (error) {
@@ -196,7 +201,7 @@ export const productService = {
 
   async updateProduct(
     id: string,
-    productData: UpdateProductRequest
+    productData: UpdateProductRequest,
   ): Promise<Product> {
     // ✅ Cambiado a string
     try {
@@ -221,7 +226,7 @@ export const productService = {
   async searchProduct(query: string): Promise<Product[]> {
     try {
       const response = await api.get(
-        `/products/search?q=${encodeURIComponent(query)}`
+        `/products/search?q=${encodeURIComponent(query)}`,
       );
       return response.data;
     } catch (error) {
