@@ -5,7 +5,9 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import UserManagement from './components/UserManagement';
 import ProductManagement from './components/ProductManagement';
-import Layout from './components/Layout';= false }: { children: React.ReactNode; adminOnly?: boolean }) {
+import Layout from './components/Layout';
+
+function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
   const { user, isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
