@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
+import { authService } from '../services/authService';
 
 interface User {
   id: number;
@@ -54,48 +55,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (credentials: { username: string; password: string }) => {
     try {
-      // Mock API call - replace with actual API endpoint
-      const response = await new Promise<{ data: { user: User; token: string } }>((resolve, reject) => {
-        setTimeout(() => {
-          if (credentials.username === 'admin' && credentials.password === 'admin') {
-            resolve({
-              data: {
-                user: {
-                  id: 1,
-                  username: 'admin',
-                  email: 'admin@example.com',
-                  role: 'admin',
-                  createdAt: new Date().toISOString()
-                },
-                token: 'mock-jwt-token-admin'
-              }
-            });
-          } else if (credentials.username === 'user' && credentials.password === 'user') {
-            resolve({
-              data: {
-                user: {
-                  id: 2,
-                  username: 'user',
-                  email: 'user@example.com',
-                  role: 'user',
-                  createdAt: new Date().toISOString()
-                },
-                token: 'mock-jwt-token-user'
-              }
-            });
-          } else {
-            reject(new Error('Invalid credentials'));
-          }
-        }, 1000);
-      });
-
-      const { user: userData, token } = response.data;
+      const response = await authService.login(credentials);
+      const { user: userData, token } = response;
+      
+      // Convert role to lowercase for consistency with AuthContext
+      const user = {
+        ...userData,
+        role: userData.role.toLowerCase() as 'admin' | 'user'
+      };
       
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(user));
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      setUser(userData);
+      setUser(user);
     } catch (error) {
       throw new Error('Invalid credentials');
     }
