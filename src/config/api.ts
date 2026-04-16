@@ -3,16 +3,19 @@ import axios from "axios";
 /** Public API URL; must be absolute on GitHub Pages or requests hit the static host (404 on /products). */
 const DEFAULT_API_BASE = "https://nodebackend-mysql-api.onrender.com/api";
 
-interface ViteImportMeta {
-  readonly env: {
-    readonly VITE_API_URL?: string;
-  };
-}
-
 function resolveApiBaseUrl(): string {
-  const meta = import.meta as unknown as ViteImportMeta;
-  const fromEnv = meta.env.VITE_API_URL?.trim().replace(/\/+$/, "") ?? "";
-  return fromEnv || DEFAULT_API_BASE;
+  try {
+    // Try to get from environment variables
+    const envUrl = (import.meta as any)?.env?.VITE_API_URL;
+    if (envUrl && typeof envUrl === "string") {
+      return envUrl.trim().replace(/\/+$/, "");
+    }
+  } catch (error) {
+    console.warn("Could not read VITE_API_URL from environment", error);
+  }
+  
+  // Always fallback to default backend
+  return DEFAULT_API_BASE;
 }
 
 const api = axios.create({
