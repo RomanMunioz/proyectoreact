@@ -26,6 +26,7 @@ function AppRoutes() {
   
   return (
     <Routes>
+      <Route path="/proyectoreact" element={<Navigate to="/" replace />} />
       <Route 
         path="/login" 
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
