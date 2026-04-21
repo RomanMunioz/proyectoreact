@@ -6,9 +6,9 @@ import {
   type CreateProductRequest,
 } from "../services/productService";
 
-/** Backend may expose `categories` or `category`; normalize for display and forms. */
+/** Normalize categories for display and forms. */
 function categoriesOf(product: Product & { categories?: string }): string {
-  return product.categories ?? product.categories ?? "";
+  return product.categories ?? "";
 }
 
 export default function ProductManagement() {
@@ -224,14 +224,14 @@ export default function ProductManagement() {
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
+                value={categoriesFilter}
+                onChange={(e) => setCategoriesFilter(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Todas las categorías</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                {categories.map((categories) => (
+                  <option key={categories} value={categories}>
+                    {categories}
                   </option>
                 ))}
               </select>
@@ -285,7 +285,7 @@ export default function ProductManagement() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {categoryOf(product)}
+                      {categoriesOf(product)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

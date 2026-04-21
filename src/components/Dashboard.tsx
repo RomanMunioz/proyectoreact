@@ -8,7 +8,7 @@ interface Product {
   description: string;
   quantity: number;
   price: number;
-  category: string;
+  categories: string;
   minStock: number;
 }
 
@@ -40,7 +40,7 @@ export default function Dashboard() {
         description: 'Laptop ultrabook de alta gama',
         quantity: 15,
         price: 1299.99,
-        category: 'Electrónicos',
+        categories: 'Electrónicos',
         minStock: 5
       },
       {
@@ -49,7 +49,7 @@ export default function Dashboard() {
         description: 'Mouse inalámbrico ergonómico',
         quantity: 3,
         price: 99.99,
-        category: 'Accesorios',
+        categories: 'Accesorios',
         minStock: 10
       },
       {
@@ -58,7 +58,7 @@ export default function Dashboard() {
         description: 'Monitor 4K para profesionales',
         quantity: 8,
         price: 399.99,
-        category: 'Monitores',
+        categories: 'Monitores',
         minStock: 5
       },
       {
@@ -67,7 +67,7 @@ export default function Dashboard() {
         description: 'Teclado mecánico RGB',
         quantity: 25,
         price: 149.99,
-        category: 'Accesorios',
+        categories: 'Accesorios',
         minStock: 15
       }
     ]);

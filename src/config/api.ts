@@ -85,7 +85,7 @@ export interface Product {
   description: string;
   quantity: number;
   price: number;
-  category: string;
+  categories: string;
   minStock: number;
   createdAt: string;
   updatedAt: string;
@@ -96,7 +96,7 @@ export interface CreateProductRequest {
   description: string;
   quantity: number;
   price: number;
-  category: string;
+  categories: string;
   minStock: number;
 }
 
@@ -105,7 +105,7 @@ export interface UpdateProductRequest {
   description?: string;
   quantity?: number;
   price?: number;
-  category?: string;
+  categories?: string;
   minStock?: number;
 }
 
