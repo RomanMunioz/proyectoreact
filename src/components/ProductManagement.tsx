@@ -7,8 +7,8 @@ import {
 } from "../services/productService";
 
 /** Backend may expose `categories` or `category`; normalize for display and forms. */
-function categoryOf(product: Product & { category?: string }): string {
-  return product.category ?? product.categories ?? "";
+function categoriesOf(product: Product & { categories?: string }): string {
+  return product.categories ?? product.categories ?? "";
 }
 
 export default function ProductManagement() {
@@ -17,7 +17,7 @@ export default function ProductManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [categoriesFilter, setCategoriesFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
@@ -107,7 +107,7 @@ export default function ProductManagement() {
       description: product.description,
       quantity: product.quantity,
       price: product.price,
-      categories: categoryOf(product),
+      categories: categoriesOf(product),
       minStock: product.minStock,
     });
     setError("");
@@ -173,10 +173,10 @@ export default function ProductManagement() {
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      if (!categoryFilter) return true;
-      return categoryOf(product) === categoryFilter;
+      if (!categoriesFilter) return true;
+      return categoriesOf(product) === categoriesFilter;
     });
-  }, [products, categoryFilter]);
+  }, [products, categoriesFilter]);
 
   if (loading && products.length === 0) {
     return (
