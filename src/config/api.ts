@@ -1,7 +1,7 @@
 import axios from "axios";
 
 /** Public API URL; must be absolute on GitHub Pages or requests hit the static host (404 on /products). */
-const DEFAULT_API_BASE = "https://nodebackend-mysql-api.onrender.com/api";
+const DEFAULT_API_BASE = "https://nodebackend-mysql-api.onrender.com";
 
 function resolveApiBaseUrl(): string {
   try {
@@ -13,20 +13,24 @@ function resolveApiBaseUrl(): string {
   } catch (error) {
     console.warn("Could not read VITE_API_URL from environment", error);
   }
-  
+
   // Always fallback to default backend
   return DEFAULT_API_BASE;
 }
 
 const api = axios.create({
   baseURL: resolveApiBaseUrl(),
-  timeout: 10000,
+  timeout: 30000,
 });
 
-// ✅ Interceptor para debugging
+// ✅ Interceptor para debugging y autenticación
 api.interceptors.request.use(
   (config) => {
     console.log(`Making request to: ${config.baseURL}${config.url}`);
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
