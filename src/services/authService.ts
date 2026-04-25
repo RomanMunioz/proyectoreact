@@ -39,24 +39,4 @@ export const authService = {
 
     throw new Error("Credenciales inválidas");
   },
-
-  async register(userData: {
-    username: string;
-    email: string;
-    password: string;
-    role: "ADMIN" | "USER";
-  }): Promise<User> {
-    const response = await api.post("/auth/register", userData);
-    return response.data;
-  },
-
-  async getCurrentUser(): Promise<User> {
-    const response = await api.get("/auth/me");
-    return response.data;
-  },
-
-  async refreshToken(): Promise<AuthResponse> {
-    const response = await api.post("/auth/refresh");
-    return response.data;
-  },
 };
