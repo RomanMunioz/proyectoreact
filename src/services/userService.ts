@@ -1,10 +1,10 @@
-import api from '../config/api';
+import api from "../config/api";
 
 export interface User {
   id: number;
   username: string;
   email: string;
-  role: 'ADMIN' | 'USER';
+  role: "ADMIN" | "USER";
   createdAt: string;
   lastLogin?: string;
 }
@@ -13,19 +13,19 @@ export interface CreateUserRequest {
   username: string;
   email: string;
   password: string;
-  role: 'ADMIN' | 'USER';
+  role: "ADMIN" | "USER";
 }
 
 export interface UpdateUserRequest {
   username?: string;
   email?: string;
   password?: string;
-  role?: 'ADMIN' | 'USER';
+  role?: "ADMIN" | "USER";
 }
 
 export const userService = {
   async getAllUsers(): Promise<User[]> {
-    const response = await api.get('/users');
+    const response = await api.get("/users");
     return response.data;
   },
 
@@ -35,7 +35,7 @@ export const userService = {
   },
 
   async createUser(userData: CreateUserRequest): Promise<User> {
-    const response = await api.post('/users', userData);
+    const response = await api.post("/users", userData);
     return response.data;
   },
 
@@ -49,7 +49,9 @@ export const userService = {
   },
 
   async searchUsers(query: string): Promise<User[]> {
-    const response = await api.get(`/users/search?q=${encodeURIComponent(query)}`);
+    const response = await api.get(
+      `/users/search?q=${encodeURIComponent(query)}`,
+    );
     return response.data;
-  }
+  },
 };
